@@ -1,0 +1,17 @@
+[package]
+name = "blocks3"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+
+rtaudio = "0.3.3"
+dasp = {version="0.11.0", features=["all"]}
+hound = "3.5.1"
+
+iced = {path="../iced", features=["advanced","canvas","tokio"]}
+
+mlua = {version="0.9.9",features=["lua54","macros"]}
+smol_str = "0.3.2"
+rfd = "0.15.1"
