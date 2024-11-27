@@ -196,6 +196,7 @@ impl Win {
     
     let console : Element<()> = container(console::view(self.editor.borrow().con_txt()))
     .width(600)
+    .padding(10)
     .height(iced::Length::Fill)
     .style(|_|self.skin.console_box())
     .into();
