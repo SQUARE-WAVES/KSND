@@ -212,7 +212,7 @@ impl Win {
 
     column![
       iced::widget::vertical_space().height(25),
-      container(waveform.map(Msg::SndView)).style(|_|self.skin.waveform_box()),
+      container(waveform.map(Msg::SndView)).height(600).style(|_|self.skin.waveform_box()),
       row![
         column![
           cmd_input.map(Msg::CmdLine),

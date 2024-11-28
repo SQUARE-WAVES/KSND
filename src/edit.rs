@@ -103,4 +103,9 @@ impl Editor {
   pub fn dirty_up(&mut self) {
     self.dirty = true;
   }
+
+  pub fn reset_stack(&mut self,ctx:Ctx) {
+    self.stack = undo::Stack::new(ctx);
+    self.dirty = true;
+  }
 }
