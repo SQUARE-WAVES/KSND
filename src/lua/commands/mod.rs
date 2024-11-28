@@ -73,6 +73,8 @@ pub fn add_command_fns(l:&Lua,globals:&LuaTable) -> LuaResult<()> {
 
   //delete
   globals.set("delete",l.create_function(copypaste::delete)?)?;
+  globals.set("crop",l.create_function(copypaste::crop)?)?;
+
 
   //amp
   globals.set("gain",l.create_function(amp::gain)?)?;

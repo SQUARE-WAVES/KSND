@@ -25,3 +25,28 @@ pub fn remove_selected(ctx:&Ctx) -> Option<Ctx> {
     None
   }
 }
+
+//aka "Crop"
+pub fn remove_non_selected(ctx:&Ctx) -> Option<Ctx> {
+  if let Some(r) = ctx.selected_region() {
+    let (s,e) = r.sample_range();
+    let deld = ctx.seqs().map(|(_,active,seq)|{
+      if active {
+        seq.sub_seq(s..e)
+      }
+      else {
+        seq.clone()
+      }
+    });
+
+    let mut new_ctx = ctx.flip(Snd::from_iter(ctx.snd.sample_rate(),deld).into());
+    new_ctx.cursor=None;
+    new_ctx.selection = None;
+
+    Some(new_ctx)
+  }
+  else {
+    None
+  }
+
+}

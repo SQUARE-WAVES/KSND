@@ -42,13 +42,28 @@ pub fn mix_in(l:&Lua,(src,src_gain,tgt_gain):(LuaSnd,Option<f32>,Option<f32>)) -
   Ok(())
 }
 
-//this is here for now
+//=============================================================================
+//This stuff is here for now, it's not a good file to have them in
+//but I can't think of what I want to call the file to have them in
 pub fn delete(l:&Lua,_:()) -> LuaResult<()> {
   let ed_cell = super::grab_editor(l)?;
   let mut ed = ed_cell.borrow_mut();
   let ctx = ed.ctx();
 
   if let Some(new_guy) = delete::remove_selected(ctx) {
+    ed.push_new(new_guy);
+    ed.dirty_up();
+  }
+
+  Ok(())
+}
+
+pub fn crop(l:&Lua,_:()) -> LuaResult<()> {
+  let ed_cell = super::grab_editor(l)?;
+  let mut ed = ed_cell.borrow_mut();
+  let ctx = ed.ctx();
+
+  if let Some(new_guy) = delete::remove_non_selected(ctx) {
     ed.push_new(new_guy);
     ed.dirty_up();
   }
