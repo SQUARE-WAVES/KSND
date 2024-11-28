@@ -23,6 +23,7 @@ mod time;
 pub fn add_command_fns(l:&Lua,globals:&LuaTable) -> LuaResult<()> {
   //fs
   globals.set("load",l.create_function(fs::load)?)?;
+  globals.set("load_new",l.create_function(fs::load_new)?)?;
   globals.set("save",l.create_function(fs::save)?)?;
   globals.set("save_as",l.create_function(fs::save_as)?)?;
 
@@ -73,6 +74,8 @@ pub fn add_command_fns(l:&Lua,globals:&LuaTable) -> LuaResult<()> {
 
   //delete
   globals.set("delete",l.create_function(copypaste::delete)?)?;
+  globals.set("crop",l.create_function(copypaste::crop)?)?;
+
 
   //amp
   globals.set("gain",l.create_function(amp::gain)?)?;
