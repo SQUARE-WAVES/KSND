@@ -211,7 +211,6 @@ impl Win {
     .into();
 
     column![
-      iced::widget::vertical_space().height(25),
       container(waveform.map(Msg::SndView)).height(600).style(|_|self.skin.waveform_box()),
       row![
         column![

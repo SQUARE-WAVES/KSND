@@ -183,7 +183,7 @@ const WINSET : iced::window::Settings = iced::window::Settings {
   platform_specific: iced::window::settings::PlatformSpecific{
     title_hidden: false,
     titlebar_transparent: false,
-    fullsize_content_view: true
+    fullsize_content_view: false 
   },
   exit_on_close_request: true
 };
