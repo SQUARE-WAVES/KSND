@@ -307,8 +307,7 @@ impl<'a> canvas::Program<Msg> for SndCanvas<'a> {
     if let Some(r) = self.ruler {
       const TK_H:f32 = 24.0;
 
-      //there is some weird stuff with the box height
-      let top_y = 0.0;
+      let top_y = 1.0;
       let btm_y = bounds.height-1.0;
       
 

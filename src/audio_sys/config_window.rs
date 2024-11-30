@@ -146,9 +146,8 @@ impl State {
   }
 
   pub fn view(&self) -> Element<Msg> {
-    let vert = iced::widget::vertical_space().height(20);
     let cbx = combo_box(&self.hosts,"pick a host",self.selected_host.as_ref(),Msg::HostSelect);
-    let col = column![vert,cbx];
+    let col = column![cbx];
 
     let col = if let Some(s) = self.out_devs.as_ref() {
       let out_box = combo_box(s,"",self.out_dev.as_ref(),Msg::OutSelect);
