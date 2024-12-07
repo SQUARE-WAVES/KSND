@@ -14,6 +14,7 @@ pub use ctx::Ctx;
 //features
 pub mod paste;
 pub mod delete;
+pub mod channels;
 pub mod amp;
 pub mod sample_rates;
 pub mod fx;

@@ -11,6 +11,7 @@ mod ruler;
 mod nav;
 mod copypaste;
 mod amp;
+mod channels;
 mod sample_rates;
 mod fs;
 mod time;
@@ -38,6 +39,11 @@ pub fn add_command_fns(l:&Lua,globals:&LuaTable) -> LuaResult<()> {
   globals.set("print_nfo",l.create_function(basics::print_nfo)?)?;
   globals.set("clear",l.create_function(basics::clear_console)?)?;
   globals.set("configure_audio",l.create_function(basics::config)?)?;
+
+  //channels
+  globals.set("solo_channel",l.create_function(channels::solo)?)?;
+  globals.set("delete_channel",l.create_function(channels::delete)?)?;
+  globals.set("insert_channel",l.create_function(channels::insert)?)?;
 
   //ruler stuff
   globals.set("set_ruler",l.create_function(ruler::set)?)?;
