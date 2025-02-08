@@ -8,6 +8,7 @@ use iced::{
   keyboard,
   widget::{
     canvas,
+    Action,
     canvas::{
       Path,
       Cache,
@@ -15,7 +16,6 @@ use iced::{
       Stroke,
       Fill,
       stroke,
-      event::Status,
       Event
     }
   },
@@ -79,11 +79,11 @@ impl<'a> canvas::Program<Msg> for SndCanvas<'a> {
   
   fn update(&self,
     state:&mut CvState,
-    event: Event,
+    event: &Event,
     r: Rectangle,
     cursor: Cursor
   ) 
-    -> (Status,Option<Msg>) 
+    -> Option<Action<Msg>> 
   {
     match event {
       Event::Mouse(mev) => {
@@ -91,7 +91,7 @@ impl<'a> canvas::Program<Msg> for SndCanvas<'a> {
 
         match mev {
           mouse::Event::CursorMoved{position,..} => {
-            let (nrm_x,nrm_y) = norm_points(position,r);
+            let (nrm_x,nrm_y) = norm_points(*position,r);
 
             let ev = match (state.left_down,state.right_down) {
               (Some((x,y)),None) if x != nrm_x && y != nrm_y => {
@@ -110,72 +110,81 @@ impl<'a> canvas::Program<Msg> for SndCanvas<'a> {
             state.ptr_x = nrm_x;
             state.ptr_y = nrm_y;
 
-            (Status::Captured,ev)
+            ev.map(|e|Action::publish(e).and_capture())
+
           },
 
           mouse::Event::WheelScrolled{delta:mouse::ScrollDelta::Lines{y,..}} if is_over => {
-            (Status::Captured,Some(Msg::Wheel(state.ptr_x as f64,y as f64/100.0)))
+            Some(Action::publish(Msg::Wheel(state.ptr_x as f64,*y as f64/100.0)).and_capture())
           },
 
           mouse::Event::WheelScrolled{delta:mouse::ScrollDelta::Pixels{y,..}} if is_over  => {
-            (Status::Captured,Some(Msg::Wheel(state.ptr_x as f64,y as f64/100.0)))
+            Some(Action::publish(Msg::Wheel(state.ptr_x as f64,*y as f64/100.0)).and_capture())
           },
 
           mouse::Event::ButtonPressed(mouse::Button::Left)  if is_over => {
             state.left_down = Some((state.ptr_x,state.ptr_y));
-            (Status::Captured,Some(Msg::LeftClick(state.ptr_x,state.ptr_y,r.width,r.height)))
+            let act = Action::publish(Msg::LeftClick(state.ptr_x,state.ptr_y,r.width,r.height))
+            .and_capture();
+
+            Some(act)
           }
 
           mouse::Event::ButtonPressed(mouse::Button::Right)  if is_over => {
             state.right_down = Some((state.ptr_x,state.ptr_y));
-            (Status::Captured,Some(Msg::RightClick(state.ptr_x,state.ptr_y,r.width,r.height)))
+            let act = Action::publish(Msg::RightClick(state.ptr_x,state.ptr_y,r.width,r.height))
+            .and_capture();
+
+            Some(act)
           },
 
           mouse::Event::ButtonReleased(mouse::Button::Left) => {
             state.left_down = None;
-            (Status::Captured,Some(Msg::LeftDragEnd))
+            Some(Action::publish(Msg::LeftDragEnd).and_capture())
           }
 
           mouse::Event::ButtonReleased(mouse::Button::Right) => {
             state.right_down = None;
-            (Status::Captured,Some(Msg::RightDragEnd))
+            Some(Action::publish(Msg::RightDragEnd).and_capture())
           },
 
-          _ => (Status::Ignored,None)
+          _ => None
         }
       },
 
       Event::Keyboard(kev) => {
         match kev {
           keyboard::Event::KeyPressed{physical_key,..} => {
-            if state.keys_down.insert(physical_key) {
+            if state.keys_down.insert(*physical_key) {
               let x = state.ptr_x;
               let y = state.ptr_y;
+              let act = Action::publish(Msg::KeyDown(x,y,r.width,r.height,*physical_key))
+              .and_capture();
 
-              (Status::Captured,Some(Msg::KeyDown(x,y,r.width,r.height,physical_key)))
+              Some(act)
             }
             else {
-              (Status::Captured,None)
+              None
             }
           },
 
           keyboard::Event::KeyReleased{physical_key,..} => {
-            if state.keys_down.remove(&physical_key) {
+            if state.keys_down.remove(physical_key) {
               let x = state.ptr_x;
               let y = state.ptr_y;
-              (Status::Captured,Some(Msg::KeyUp(x,y,r.width,r.height,physical_key)))
+              Some(Action::publish(Msg::KeyUp(x,y,r.width,r.height,*physical_key)).and_capture())
             }
             else {
-              (Status::Captured,None)
+              None
             }
           },
 
-          _ => (Status::Ignored,None)
+          _ => None
         }
       },
   
       //ignoring touch for now
-      _ => (Status::Ignored,None)
+      _ => None
     }
   }
 

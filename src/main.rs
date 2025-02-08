@@ -29,7 +29,7 @@ fn main() {
   .antialiasing(false)
   .subscription(Main::subs)
   .style(|_,_|{
-    iced::application::Appearance {
+    iced::theme::Style{
       background_color: iced::Color::BLACK,
       text_color: iced::Color::from_rgb(0.0,1.0,0.0)
     }
@@ -174,6 +174,8 @@ const WINSET : iced::window::Settings = iced::window::Settings {
   position: iced::window::Position::Default,
   min_size: Some(iced::Size{width:120.0,height:60.0}),
   max_size: Some(iced::Size{width:1920.0,height:1080.0}),
+  fullscreen:false,
+  maximized:false,
   visible: true,
   resizable: true,
   decorations: true,

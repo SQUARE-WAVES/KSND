@@ -1,7 +1,6 @@
 use iced::{
   Rectangle as Rect,
   Event,
-  event::Status,
   Length,
   Size,
   alignment,
@@ -135,10 +134,10 @@ where
 
   //I really hate functions where they are like this there is no good way to
   //format the end where the return value is
-  fn on_event(
+  fn update(
     &mut self,
     tree: &mut Tree,
-    event: Event,
+    event: &Event,
     l: Layout<'_>,
     mouse_cursor: mouse::Cursor,
     _: &Rndr,
@@ -146,68 +145,52 @@ where
     sh: &mut iced::advanced::Shell<'_, Msg>,
     _viewport: &Rect,
   ) 
-    -> Status 
   {
     let state = tree.state.downcast_mut::<WidgetState<Rndr::Paragraph>>();
 
     match event {
       Event::Keyboard(keyboard::Event::KeyPressed {modified_key:key,modifiers,..}) => {
         if !self.focus {
-          return Status::Ignored;
+          return;
         }
 
-        sh.publish(Msg::Key(key,modifiers));
-        Status::Captured
+        //see about not cloning or something, this is a bit awkward
+        sh.publish(Msg::Key(key.clone(),modifiers.clone()));
       },
 
       Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left)) => {
         if let Some(pt) = mouse_cursor.position_over(l.bounds()) {
           let click = Click::new(pt,mouse::Button::Left,state.last_click);
 
-          let status = match(click.kind(),self.focus) {
+          match(click.kind(),self.focus) {
             (Kind::Double,false) => {
               sh.publish(Msg::RequestFocus);
-              Status::Captured
             },
             (Kind::Double,true) => {
               sh.publish(Msg::SelectAll);
-              Status::Captured
             },
             (Kind::Single,true) => {
-              if self.content.is_empty() {
-                Status::Captured
-              }
-              else if let Some(h) = state.para.raw().hit_test(pt) {
+              if let Some(h) = state.para.raw().hit_test(pt) {
                 sh.publish(Msg::SetCursor(h.cursor()));
                 state.drag = Some(h.cursor());
-                Status::Captured
-              }
-              else {
-                Status::Ignored
               }
             },
 
-            _ => Status::Ignored
+            _ => ()
           };
 
           state.last_click = Some(click);
-
-          status
-        }
-        else {
-          Status::Ignored
         }
       },
 
       Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Left)) => {
         state.drag = None;
-        Status::Captured
       },
 
       Event::Mouse(mouse::Event::CursorMoved{position:pt}) if state.drag.is_some() => {
         if self.focus {
           let drag_start = state.drag.unwrap();
-          let end_hit = state.para.raw().hit_test(pt);
+          let end_hit = state.para.raw().hit_test(*pt);
 
           match end_hit {
             Some(pos) if pos.cursor() < drag_start => {
@@ -224,14 +207,10 @@ where
             None => ()
           };
 
-          Status::Captured
-        }
-        else {
-          Status::Ignored
         }
       }
 
-      _ => Status::Ignored
+      _ => ()
     }
   }
 }
